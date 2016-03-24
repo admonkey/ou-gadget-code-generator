@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Code Generator</title>
+
+		<script src="https://code.jquery.com/jquery-2.2.1.min.js" integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
+				crossorigin="anonymous"></script>
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/css/select2.min.css" rel="stylesheet" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2/js/select2.min.js"></script>
+
+		<link href="includes/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="includes/css/bootstrap-theme.min.css" rel="stylesheet" />
+		<script src="includes/js/bootstrap.min.js"></script>
+		<script src="includes/js/gadgetlib.js"></script>
+		<script src="snippets.js"></script>
+
+
+		<!-- STYLES -->
+		<style>
+			#wrapper {
+				background: #f5f5f5;
+				color: #333;
+				padding: 4px;
+			}
+			#loadingPanel,
+			#snippetPanel {
+				display: none;
+			}
+			#text {
+				max-width: 158px;
+				display: inline-block;
+			}
+
+			#selector {
+				min-height: 34px;
+				margin: 6px 0;
+			}
+
+			#loadingPanel .panel-body {
+				background-color: lightyellow;
+			}
+			body .select2-dropdown {
+				background-color: lightyellow;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="wrapper">
+			<div id="selector">
+				<select id="snippetSelect" style="width: 100%">
+					<option value="">-- Choose a Snippet --</option>
+				</select>
+			</div>
+			<div id="loadingPanel" class="panel panel-warning">
+				<div class="panel-body">
+					Loading...
+				</div>
+			</div>
+			<div id="introPanel" class="panel panel-default">
+				<div class="panel-body">
+					<p>Please select a snippet from the dropdown. </p>
+					<p><a id="tutorial_link" target="_blank">View Tutorial
+						<span class="glyphicon glyphicon-book" aria-hidden="true"></span>
+						</a></p>
+				</div>
+			</div>
+			<div id="snippetPanel" class="panel panel-success">
+				<div class="panel-heading">
+					<span id="text">Snippet Text</span>
+
+					<a href="#help_url" class="btn btn-default btn-xs pull-right" aria-label="Documentation" id="help_url">
+						<span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+					</a>
+				</div>
+				<div class="panel-body" id="description">
+					Snippet Description
+				</div>
+				<div class="panel-footer">
+					<button 
+							type="button" 
+							id="insert" 
+							data-template="templateurl" 
+							data-loading-text="Inserting..." 
+							class="btn btn-primary btn-block" autocomplete="off">
+						Insert Code in Editor
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="test" class="panel panel-default pull-right">
+
+		</div>
+
+
+		<script type="text/javascript">
+
+			var gadget = new Gadget();
+			var selectedObject = null;
+			var snippetHTML = "";
+
+			$( document ).ready(function() {
+
+				// set the tutorial link
+				$('a#tutorial_link').attr('href', gadget.getConfig('tutorial_link'));
+
+				var snippetSelect = $('#snippetSelect');
+				snippetSelect.on("change", function (e) { 
+					var snippetId= snippetSelect.val() 
+					if (snippetId != "") {
+						selectedObject = $.grep(snippets, function(elem){
+							return elem.id == snippetId;
+						});
+						selectedObject = selectedObject[0];
+					} else {
+						selectedObject = null;
+					}
+					DisplaySnippet(selectedObject);
+					//console.log(selectedObject); 
+				});
+
+				$('#snippetSelect').select2({
+					data: snippets,
+					width: 'resolve'
+				});
+			});
+
+
+			$('#snippetPanel').on('click', '#insert', function () {
+				$('#snippetSelect').prop("disabled", true);
+				var $btn = $(this).button('loading');
+				gadget.oucInsertAtCursor(snippetHTML);
+				$btn.button('reset');
+				$('#snippetSelect').prop("disabled", false);
+			});
+
+
+			function DisplaySnippet(s) {
+				startLoading();
+				if (s != null) {
+					$('#snippetPanel #text').html(s.text);
+					$('#snippetPanel #help_url').attr("href", s.help_url);
+					$('#snippetPanel #description').html(s.description);
+
+					$.get(s.snippet_url, function( data ) {
+						snippetHTML = data;
+						$('#snippetPanel').show('fast');
+						endLoading();
+					}, 'html');
+
+				} else {
+					$('#introPanel').show('fast');
+					endLoading();
+				}
+			}
+
+			function hideAllPanels() {
+				$('#loadingPanel').hide();
+				$('#introPanel').hide();
+				$('#snippetPanel').hide();
+			}
+
+			function startLoading() {
+				$('#introPanel').hide();
+				$('#snippetPanel').hide();
+				$('#loadingPanel').show();
+			}
+			function endLoading() {
+				$('#loadingPanel').hide();
+			}
+
+
+
+		</script>
+		<div style="display:none"><a href="http://a.cms.omniupdate.com/10?skin=ttu&amp;account=main&amp;site=_ttu-template&amp;action=de&amp;path=/gadgets/codegenerator/index.html" target="_top">Mar 23, 2016</a></div>
+	</body>
+
+</html>

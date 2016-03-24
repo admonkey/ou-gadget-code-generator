@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config>
+	<entry key="title">Code Generator</entry>
+	<entry key="types" private="true">sidebar</entry>
+	<entry key="icon" private="true">icon-paste-2</entry>
+	<entry key="description" private="true">Generate and insert code to the editor from a list of snippets.</entry>
+	<entry key="sidebar_context" private="true">edit</entry>
+	<entry key="initial_height" private="true">240</entry>
+	
+	<!-- customizable params -->
+	<entry key="tutorial_link" label="Tutorial Link URL" private="false">http://wikis.ttu.edu</entry>
+</config>
